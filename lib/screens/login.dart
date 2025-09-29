@@ -7,7 +7,7 @@ class LoginPage extends StatefulWidget {
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
-
+ 
 class _LoginPageState extends State<LoginPage> {
   // Bertindak sebagai "database" sementara untuk menyimpan data user.
   // Kunci: email, Nilai: Map berisi 'password' dan 'pin'.

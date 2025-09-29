@@ -8,7 +8,7 @@ void main() {
 
 class MobileBankingApp extends StatelessWidget {
   const MobileBankingApp({super.key});
-
+ 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
