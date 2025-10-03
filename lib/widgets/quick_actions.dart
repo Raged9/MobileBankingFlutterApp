@@ -62,12 +62,12 @@ class QuickActions extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey,
-              spreadRadius: 1,
-              blurRadius: 5,
+              color: Colors.grey.shade500,
+              spreadRadius: 0.5,
+              blurRadius: 2,
             ),
           ],
         ),

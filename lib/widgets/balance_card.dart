@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import '../models/user_data.dart';
+import 'package:intl/intl.dart';
 
 class BalanceCard extends StatelessWidget {
   const BalanceCard({super.key});
+
+  String _formatBalance(double balance) {
+    final formatter = NumberFormat('#,###', 'id_ID');
+    return formatter.format(balance).replaceAll(',', '.');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +29,7 @@ class BalanceCard extends StatelessWidget {
             ],
           ),
         ),
-        
+
         Positioned(
           top: 20,
           right: 24,
@@ -33,7 +39,7 @@ class BalanceCard extends StatelessWidget {
             fit: BoxFit.contain,
           ),
         ),
-        
+
         Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -46,7 +52,7 @@ class BalanceCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Rp ${userData.balance}',
+                'Rp ${_formatBalance(userData.balance)}',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 32,

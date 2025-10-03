@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import '../models/user_data.dart';
-import '../screens/placeholder_page.dart';
+import '../screens/settings_screen.dart';
 
 class Header extends StatelessWidget {
   const Header({super.key});
 
-  void _navigateToNewPage(BuildContext context) {
+  void _navigateToSettings(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const PlaceholderPage()),
+      MaterialPageRoute(builder: (context) => const SettingsScreen()),
     );
   }
 
@@ -26,7 +26,7 @@ class Header extends StatelessWidget {
         ),
         IconButton(
           icon: const Icon(Icons.settings, color: Colors.black54),
-          onPressed: () => _navigateToNewPage(context),
+          onPressed: () => _navigateToSettings(context),
         ),
       ],
     );

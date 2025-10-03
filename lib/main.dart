@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
     
     return MaterialApp(
-      title: 'Banking App UI',
+      title: 'Mobile Banking App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
