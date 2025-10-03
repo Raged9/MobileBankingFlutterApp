@@ -24,8 +24,12 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   const CircleAvatar(
                     radius: 35,
-                    backgroundImage:
-                        NetworkImage('https://i.pravatar.cc/150?img=3'),
+                    backgroundColor: Colors.white, // background icon
+                    child: Icon(
+                      Icons.person, // icon user polos
+                      size: 40,
+                      color: Colors.blue,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
