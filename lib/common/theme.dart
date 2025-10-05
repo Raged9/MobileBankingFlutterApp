@@ -1,37 +1,28 @@
 import 'package:flutter/material.dart';
-
-ThemeData appTheme = ThemeData(
-  brightness: Brightness.light, 
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.blue,
-    background: Colors.white,
-  ),
+ 
+final appTheme = ThemeData(
+  colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 34, 85, 155)),
   useMaterial3: true,
-  
-  scaffoldBackgroundColor: const Color(0xFFF6FAFD),
-
-  appBarTheme: const AppBarTheme(
-    backgroundColor: Colors.blue,
-    foregroundColor: Colors.white,
-    elevation: 2,
+  fontFamily: 'Inter',
+  scaffoldBackgroundColor: Colors.grey[50],
+  inputDecorationTheme: InputDecorationTheme(
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8.0),
+    ),
+    filled: true,
+    fillColor: Colors.white,
   ),
-
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.blue,
       foregroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(255, 34, 85, 155),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8.0),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 14),
-    ),
-  ),
-  
-  outlinedButtonTheme: OutlinedButtonThemeData(
-    style: OutlinedButton.styleFrom(
-      side: const BorderSide(color: Colors.blue),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+      textStyle: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
       ),
     ),
   ),

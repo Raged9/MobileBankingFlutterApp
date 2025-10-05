@@ -44,16 +44,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.person_outline,
                 title: 'Edit Profile',
                 subtitle: 'Update your personal information',
-                onTap: () {
-                },
+                onTap: () {},
               ),
               _buildDivider(),
               _buildSettingsTile(
                 icon: Icons.lock_outline,
                 title: 'Change Password',
                 subtitle: 'Update your password',
-                onTap: () {
-                },
+                onTap: () {},
               ),
             ]),
 
@@ -83,6 +81,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'Help Center',
                 subtitle: 'Get help and support',
                 onTap: () {
+                  _showSupportCenter();
                 },
               ),
               _buildDivider(),
@@ -100,6 +99,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'Privacy Policy',
                 subtitle: 'Read our privacy policy',
                 onTap: () {
+                  _showPrivacyPolicy();
                 },
               ),
             ]),
@@ -202,10 +202,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(
-          fontSize: 13,
-          color: Colors.grey[600],
-        ),
+        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
       ),
       trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
       onTap: onTap,
@@ -239,10 +236,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(
-          fontSize: 13,
-          color: Colors.grey[600],
-        ),
+        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
       ),
       trailing: Switch(
         value: value,
@@ -287,6 +281,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _showSupportCenter() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Support Center'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Please Contact:'),
+            SizedBox(height: 8),
+            Text('hellobank@gmail.com'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+      void _showPrivacyPolicy() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Privacy Policy'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Lorem Ipsum'),
+
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showLogoutDialog() {
     showDialog(
       context: context,
@@ -306,10 +347,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 (Route<dynamic> route) => false,
               );
             },
-            child: const Text(
-              'Logout',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Logout', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
