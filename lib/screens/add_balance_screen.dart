@@ -1,3 +1,5 @@
+// lib/screens/add_balance_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -22,22 +24,23 @@ class _AddBalanceScreenState extends State<AddBalanceScreen> {
 
   void _addBalance() async {
     if (_amountController.text.isNotEmpty) {
-      final amount = double.tryParse(_amountController.text.replaceAll('.', ''));
+      final amount =
+          double.tryParse(_amountController.text.replaceAll('.', ''));
       if (amount != null && amount > 0) {
         setState(() {
           _isLoading = true;
         });
 
-        // Simulasikan penundaan jaringan
         await Future.delayed(const Duration(seconds: 1));
-
         if (!mounted) return;
 
-        await Provider.of<UserDataProvider>(context, listen: false).addBalance(amount);
+        await Provider.of<UserDataProvider>(context, listen: false)
+            .addBalance(amount);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Saldo berhasil ditambahkan: Rp ${NumberFormat('#,##0', 'id_ID').format(amount)}'),
+            content: Text(
+                'Saldo berhasil ditambahkan: Rp ${NumberFormat('#,##0', 'id_ID').format(amount)}'),
             backgroundColor: Colors.green,
           ),
         );
@@ -89,14 +92,16 @@ class _AddBalanceScreenState extends State<AddBalanceScreen> {
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(width: 10),
               _isLoading
                   ? const CircularProgressIndicator()
                   : IconButton(
-                      icon: const Icon(Icons.add_circle, size: 40, color: Colors.blue),
+                      icon: const Icon(Icons.add_circle,
+                          size: 40, color: Colors.blue),
                       onPressed: _addBalance,
                     ),
             ],
@@ -139,8 +144,10 @@ class _AddBalanceScreenState extends State<AddBalanceScreen> {
     );
   }
 
-  Widget _buildAccountNumberCard({required String accountNumber, required double balance}) {
-    final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+  Widget _buildAccountNumberCard(
+      {required String accountNumber, required double balance}) {
+    final formatter =
+        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -159,7 +166,8 @@ class _AddBalanceScreenState extends State<AddBalanceScreen> {
               ),
               Text(
                 accountNumber,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -173,7 +181,10 @@ class _AddBalanceScreenState extends State<AddBalanceScreen> {
               ),
               Text(
                 formatter.format(balance),
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue),
               ),
             ],
           ),
@@ -206,7 +217,8 @@ class _PaymentMethodTile extends StatelessWidget {
         child: Icon(icon, color: iconColor, size: 24),
       ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+      trailing:
+          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
       onTap: onTap,
     );
   }

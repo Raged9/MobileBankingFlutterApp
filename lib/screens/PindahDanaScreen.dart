@@ -1,21 +1,124 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_data_provider.dart';
+import 'pin_screen.dart';
 
-class PindahDanaScreen extends StatelessWidget {
+class PindahDanaScreen extends StatefulWidget {
   const PindahDanaScreen({super.key});
 
   @override
+  State<PindahDanaScreen> createState() => _PindahDanaScreenState();
+}
+
+class _PindahDanaScreenState extends State<PindahDanaScreen> {
+  final Map<String, String> _dummyDestination = {
+    "bank": "BCA",
+    "name": "Budi Santoso",
+    "accountNumber": "8888 1234 5678",
+  };
+  Map<String, String>? _selectedDestination;
+
+  final _amountController = TextEditingController();
+  final _notesController = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDestination = _dummyDestination;
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  void _handleTransfer() {
+    final userDataProvider =
+        Provider.of<UserDataProvider>(context, listen: false);
+    final currentBalance = userDataProvider.userData?.balance ?? 0;
+
+    if (_selectedDestination == null) {
+      _showErrorSnackbar("Silakan pilih rekening tujuan.");
+      return;
+    }
+
+    final amountText =
+        _amountController.text.replaceAll('.', '').replaceAll(',', '');
+    final amount = double.tryParse(amountText);
+
+    if (amount == null || amount <= 0) {
+      _showErrorSnackbar("Jumlah transfer tidak valid.");
+      return;
+    }
+
+    if (amount > currentBalance) {
+      _showErrorSnackbar("Saldo Anda tidak mencukupi.");
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PinVerificationScreen(
+          onPinVerified: (pin) => userDataProvider.verifyPin(pin),
+          onVerificationSuccess: () async {
+            Navigator.pop(context); // Pop PinVerificationScreen
+
+            setState(() {
+              _isLoading = true;
+            });
+
+            final success = await userDataProvider.transferBalance(
+                amount, _selectedDestination?['name'] ?? 'Penerima');
+
+            if (!mounted) return;
+
+            setState(() {
+              _isLoading = false;
+            });
+
+            if (success) {
+              _showSuccessSnackbar(
+                  'Transfer sebesar ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(amount)} berhasil!');
+              Navigator.pop(context); // Pop PindahDanaScreen
+            } else {
+              _showErrorSnackbar("Terjadi kesalahan. Gagal mentransfer dana.");
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
+  void _showSuccessSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.green),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final userData = Provider.of<UserDataProvider>(context).userData;
+    final formatter =
+        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+
     return Scaffold(
-      // Tidak perlu lagi mendefinisikan backgroundColor, akan diambil dari theme
       appBar: AppBar(
         elevation: 0,
-        // AppBar akan mengambil warna dari scaffoldBackgroundColor theme
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: Padding(
@@ -23,7 +126,6 @@ class PindahDanaScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Judul "Pindah Dana"
             const Text(
               'Pindah Dana',
               style: TextStyle(
@@ -33,65 +135,53 @@ class PindahDanaScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Card untuk Sumber dan Tujuan Dana
-            _buildSourceDestinationCard(),
-
+            _buildSourceDestinationCard(
+              sourceBalance: formatter.format(userData?.balance ?? 0),
+              destination: _selectedDestination,
+            ),
             const SizedBox(height: 24),
-
-            // Input untuk Jumlah
-            // InputDecoration sekarang akan mengikuti appTheme
-            const TextField(
-              decoration: InputDecoration(
-                hintText: 'Rp Jumlah', // Menggunakan hintText agar lebih modern
+            TextField(
+              controller: _amountController,
+              decoration: const InputDecoration(
+                hintText: 'Rp Jumlah',
               ),
               keyboardType: TextInputType.number,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-
-            // Tampilan Saldo
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Saldo bluAccount',
+                  'Saldo Akun',
                   style: TextStyle(color: Colors.grey[600]),
                 ),
-                const Text(
-                  'Rp 8.293,96',
-                  style: TextStyle(
+                Text(
+                  formatter.format(userData?.balance ?? 0),
+                  style: const TextStyle(
                       color: Colors.black, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
             const SizedBox(height: 24),
-
-            // Input untuk Catatan
-            // InputDecoration juga akan mengikuti appTheme
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: _notesController,
+              decoration: const InputDecoration(
                 hintText: 'Catatan (Opsional)',
               ),
             ),
-            const Spacer(), // Mendorong elemen berikutnya ke bawah
-
-            // Kotak Informasi
-            _buildInfoBox(),
-            const SizedBox(height: 16),
-
-            // Tombol Lanjut
-            SizedBox(
-              width: double.infinity,
-              // ElevatedButton sekarang akan otomatis menggunakan gaya dari theme
-              child: ElevatedButton(
-                onPressed: () {
-                  // Aksi ketika tombol Lanjut ditekan
-                },
-                // Tidak perlu lagi mendefinisikan style di sini
-                child: const Text('Lanjut'),
+            const Spacer(),
+            if (_isLoading)
+              const Center(child: CircularProgressIndicator())
+            else
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _handleTransfer,
+                  child: const Text('Lanjut'),
+                ),
               ),
-            ),
             const SizedBox(height: 24),
           ],
         ),
@@ -99,8 +189,10 @@ class PindahDanaScreen extends StatelessWidget {
     );
   }
 
-  // Widget untuk Card Sumber & Tujuan (tidak berubah)
-  Widget _buildSourceDestinationCard() {
+  Widget _buildSourceDestinationCard({
+    required String sourceBalance,
+    Map<String, String>? destination,
+  }) {
     return Card(
       elevation: 1,
       shadowColor: Colors.grey.withOpacity(0.2),
@@ -112,52 +204,34 @@ class PindahDanaScreen extends StatelessWidget {
           ListTile(
             leading: CircleAvatar(
               backgroundColor: Colors.cyan[700],
-              child: const Text('BCA', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+              child: const Text('BCA',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold)),
             ),
-            title: const Text('bluAccount'),
-            subtitle: const Text(
-              'Rp 8.293,96',
-              style: TextStyle(
+            title: const Text('Akun Saya'),
+            subtitle: Text(
+              sourceBalance,
+              style: const TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            trailing: const Icon(Icons.expand_more),
           ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: Divider(height: 1),
           ),
           ListTile(
-            leading: const CircleAvatar(
+            leading: CircleAvatar(
               backgroundColor: Colors.black,
-              child: Icon(Icons.account_balance_wallet_outlined, color: Colors.white, size: 20),
+              child: Text(destination?['bank']?.substring(0, 1) ?? '?',
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
             ),
-            title: Text('Pilih Tujuan', style: TextStyle(color: Colors.grey[600])),
-            trailing: const Icon(Icons.expand_more),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Widget untuk kotak informasi (tidak berubah)
-  Widget _buildInfoBox() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.blue[50],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.lightbulb, color: Colors.blue[400]),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Text(
-              'Transaksi ini akan diproses tanpa penggunaan PIN ya',
-              style: TextStyle(fontSize: 13),
-            ),
+            title: Text(destination?['name'] ?? 'Pilih Tujuan'),
+            subtitle: Text(destination?['accountNumber'] ?? ''),
           ),
         ],
       ),

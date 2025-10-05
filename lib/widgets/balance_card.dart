@@ -1,14 +1,39 @@
+// lib/widgets/balance_card.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_data_provider.dart';
 import 'package:intl/intl.dart';
 
-class BalanceCard extends StatelessWidget {
+class BalanceCard extends StatefulWidget {
   const BalanceCard({super.key});
+
+  @override
+  State<BalanceCard> createState() => _BalanceCardState();
+}
+
+class _BalanceCardState extends State<BalanceCard> {
+  bool _isAccountNumberVisible = false;
 
   String _formatBalance(double balance) {
     final formatter = NumberFormat('#,##0', 'id_ID');
     return formatter.format(balance);
+  }
+
+  String _formatAccountNumber(String accountNumber, {required bool isVisible}) {
+    if (accountNumber.length != 16) return accountNumber;
+
+    if (isVisible) {
+      return '${accountNumber.substring(0, 4)} ${accountNumber.substring(4, 8)} ${accountNumber.substring(8, 12)} ${accountNumber.substring(12, 16)}';
+    } else {
+      return '**** **** **** ${accountNumber.substring(12, 16)}';
+    }
+  }
+
+  void _toggleAccountNumberVisibility() {
+    setState(() {
+      _isAccountNumberVisible = !_isAccountNumberVisible;
+    });
   }
 
   @override
@@ -65,12 +90,30 @@ class BalanceCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        userData?.cardNumber ?? '**** **** **** ****',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          letterSpacing: 2,
+                      GestureDetector(
+                        onTap: _toggleAccountNumberVisibility,
+                        child: Row(
+                          children: [
+                            Text(
+                              _formatAccountNumber(
+                                userData?.accountNumber ?? '',
+                                isVisible: _isAccountNumberVisible,
+                              ),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                letterSpacing: 2,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(
+                              _isAccountNumberVisible
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              color: Colors.white70,
+                              size: 20,
+                            ),
+                          ],
                         ),
                       ),
                       Image.asset(

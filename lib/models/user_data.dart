@@ -1,3 +1,5 @@
+// lib/models/user_data.dart
+
 class UserData {
   final String name;
   final String email;
@@ -18,16 +20,27 @@ class UserData {
     required this.accountNumber,
     required this.pin,
   });
+
+  // Method untuk membuat salinan objek dengan nilai yang diperbarui
+  UserData copyWith({
+    String? name,
+    String? email,
+    String? cardNumber,
+    double? balance,
+    String? phoneNumber,
+    String? address,
+    String? accountNumber,
+    String? pin,
+  }) {
+    return UserData(
+      name: name ?? this.name,
+      email: email ?? this.email,
+      cardNumber: cardNumber ?? this.cardNumber,
+      balance: balance ?? this.balance,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      address: address ?? this.address,
+      accountNumber: accountNumber ?? this.accountNumber,
+      pin: pin ?? this.pin,
+    );
+  }
 }
-
-var userData = UserData(
-  name: '',
-  email: '',
-  cardNumber: '**** **** **** 1234',
-  balance: 0,
-  phoneNumber: '',
-  address: '',
-  accountNumber: '',
-  pin: '',
-);
-

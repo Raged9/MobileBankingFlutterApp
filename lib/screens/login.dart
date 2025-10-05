@@ -1,3 +1,5 @@
+// lib/screens/login.dart
+
 import 'dart:convert';
 import 'dart:async';
 import 'dart:math';
@@ -68,9 +70,10 @@ class _LoginPageState extends State<LoginPage> {
 
   String _generateAccountNumber() {
     final random = Random();
-    const fixedPrefix = '77777';
+    const fixedPrefix = '77777'; // 5 digit
     String randomNumber = '';
-    for (int i = 0; i < 9; i++) {
+    // Hasilkan 11 digit acak agar totalnya menjadi 16
+    for (int i = 0; i < 11; i++) {
       randomNumber += random.nextInt(10).toString();
     }
     return fixedPrefix + randomNumber;
@@ -79,19 +82,13 @@ class _LoginPageState extends State<LoginPage> {
   void _handleRegister() {
     if (_registerFormKey.currentState!.validate()) {
       final accountNumber = _generateAccountNumber();
-      //
-      // CATATAN KEAMANAN:
-      // PIN tidak boleh disimpan sebagai plain text.
-      // Gunakan library enkripsi yang kuat seperti 'flutter_secure_storage'
-      // atau 'encrypt' untuk mengenkripsi PIN sebelum disimpan.
-      // Di sini, kita menggunakan Base64 sebagai placeholder untuk proses enkripsi.
       final encryptedPin = base64.encode(utf8.encode(_pinController.text));
 
       setState(() {
         _registeredUsers[_emailController.text] = {
           'name': _nameController.text,
           'password': _passwordController.text,
-          'pin': encryptedPin, // Simpan PIN yang sudah di-"enkripsi"
+          'pin': encryptedPin,
           'nik': _nikController.text,
           'balance': '0',
           'accountNumber': accountNumber,
@@ -137,16 +134,10 @@ class _LoginPageState extends State<LoginPage> {
             phoneNumber: '+62 812 3456 7890',
             address: 'Jakarta, Indonesia',
             accountNumber: userData['accountNumber'] ?? '',
-            // PIN yang disimpan adalah yang sudah dienkripsi
             pin: userData['pin'] ?? '');
 
         Provider.of<UserDataProvider>(context, listen: false)
             .loginUser(currentUser);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Login Berhasil!'), backgroundColor: Colors.green),
-        );
 
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const HomePage()),
@@ -158,10 +149,12 @@ class _LoginPageState extends State<LoginPage> {
 
         String message = 'Email atau password salah.';
         if (_loginAttempts >= 3) {
-          message += ' Percobaan ke-$_loginAttempts. Setelah 5x gagal, akun akan dikunci.';
+          message +=
+              ' Percobaan ke-$_loginAttempts. Setelah 5x gagal, akun akan dikunci.';
         }
         if (_loginAttempts >= 5) {
-          message = 'Anda telah 5x gagal login. Akun dikunci selama 30 detik.';
+          message =
+              'Anda telah 5x gagal login. Akun dikunci selama 30 detik.';
           _isLockedOut = true;
           Timer(const Duration(seconds: 30), () {
             setState(() {
@@ -191,10 +184,8 @@ class _LoginPageState extends State<LoginPage> {
       _nameController.clear();
     });
   }
-  
+
   void _showBiometricPrompt() {
-    // Placeholder untuk fungsionalitas biometrik.
-    // Untuk implementasi nyata, gunakan package seperti 'local_auth'.
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Fitur biometrik belum diimplementasikan.'),
@@ -324,7 +315,8 @@ class _LoginPageState extends State<LoginPage> {
               FilteringTextInputFormatter.digitsOnly,
               LengthLimitingTextInputFormatter(6),
             ],
-            validator: (value) => value!.length < 6 ? 'PIN harus 6 digit' : null,
+            validator: (value) =>
+                value!.length < 6 ? 'PIN harus 6 digit' : null,
           ),
           const SizedBox(height: 24),
           ElevatedButton(

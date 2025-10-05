@@ -1,3 +1,5 @@
+// lib/screens/home_screen.dart
+
 import 'package:flutter/material.dart';
 import '../widgets/balance_card.dart';
 import '../widgets/header.dart';
@@ -5,6 +7,8 @@ import '../widgets/quick_actions.dart';
 import '../widgets/promo.dart';
 import '../screens/profile_page.dart';
 import 'placeholder_page.dart';
+import 'info_screens.dart';
+import 'transaction_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,33 +20,44 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final int _selectedIndex = 0;
 
-  void _navigateToNewPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const PlaceholderPage()),
-    );
-  }
   void _onItemTapped(int index) {
     if (index == _selectedIndex) return;
 
-    if (index == 3) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ProfilePage()),
-      );
-    }
-    else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const PlaceholderPage()),
-      );
+    switch (index) {
+      case 0:
+        // Anda sudah di halaman Home
+        break;
+      case 1: // Item "News"
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const InfoScreen()),
+        );
+        break;
+      case 2: // Item "QRIS"
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PlaceholderPage()),
+        );
+        break;
+      case 3: // Item "Profile"
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ProfilePage()),
+        );
+        break;
+      case 4: // Item "History"
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const TransactionScreen()),
+        );
+        break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 34, 85, 155),
+      backgroundColor: const Color.fromARGB(255, 34, 85, 155),
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -62,6 +77,7 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.all(20.0),
                   children: const [
                     BalanceCard(),
+                    SizedBox(height: 16.0),
                     QuickActions(),
                     SizedBox(height: 18.0),
                     PromoSlider(),
@@ -75,13 +91,16 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.article_outlined), label: 'News'),
-          BottomNavigationBarItem(icon: Icon(Icons.qr_code_scanner), label: 'QRIS'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.article_outlined), label: 'News'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.qr_code_scanner), label: 'QRIS'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline), label: 'Profile'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Color.fromARGB(255, 34, 85, 155),
+        selectedItemColor: const Color.fromARGB(255, 34, 85, 155),
         unselectedItemColor: Colors.grey.shade600,
         onTap: _onItemTapped,
         showUnselectedLabels: true,

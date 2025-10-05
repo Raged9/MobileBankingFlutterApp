@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/user_data.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_data_provider.dart'; // Import provider
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Ambil data pengguna dari Provider
+    final userData = Provider.of<UserDataProvider>(context).userData;
+    
     final currencyFormatter =
         NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
@@ -42,8 +46,8 @@ class ProfilePage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            userData.name,
-                            style: TextStyle(
+                            userData?.name ?? 'Guest', // Gunakan data dari provider
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -77,8 +81,9 @@ class ProfilePage extends StatelessWidget {
               _buildCard(
                 title: "Savings Account",
                 accountName: "Tahapan Halo - IDR",
-                accountNo: userData.cardNumber,
-                balance: currencyFormatter.format(userData.balance),
+                // Ubah dari cardNumber ke accountNumber
+                accountNo: userData?.accountNumber ?? 'N/A', 
+                balance: currencyFormatter.format(userData?.balance ?? 0),
               ),
 
               // Investment Card

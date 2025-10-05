@@ -2,15 +2,19 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_data.dart';
+import '../models/transaction_data.dart';
 
 class UserDataProvider with ChangeNotifier {
   UserData? _userData;
+  List<TransactionData> _transactions = [];
+
   bool _isLoggedIn = false;
-  bool _isLoading = true; // Tambahkan state loading
+  bool _isLoading = true;
 
   UserData? get userData => _userData;
+  List<TransactionData> get transactions => _transactions;
   bool get isLoggedIn => _isLoggedIn;
-  bool get isLoading => _isLoading; // Getter untuk loading
+  bool get isLoading => _isLoading;
 
   Future<void> checkLoginStatus() async {
     _isLoading = true;
@@ -37,6 +41,7 @@ class UserDataProvider with ChangeNotifier {
             pin: userDataMap['pin'] ?? '',
           );
           _isLoggedIn = true;
+          await loadTransactions();
         } else {
           _isLoggedIn = false;
         }
@@ -50,11 +55,37 @@ class UserDataProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> loadTransactions() async {
+    if (_userData == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'transactions_${_userData!.email}';
+    final transactionsJson = prefs.getString(key);
+    if (transactionsJson != null) {
+      _transactions = TransactionData.decode(transactionsJson);
+    } else {
+      _transactions = [];
+    }
+    notifyListeners();
+  }
+
+  Future<void> addTransaction(TransactionData transaction) async {
+    _transactions.insert(0, transaction);
+
+    if (_userData == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'transactions_${_userData!.email}';
+    final encodedData = TransactionData.encode(_transactions);
+    await prefs.setString(key, encodedData);
+
+    notifyListeners();
+  }
+
   Future<void> loginUser(UserData userData) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('last_logged_in_user', userData.email);
     _userData = userData;
     _isLoggedIn = true;
+    await loadTransactions();
     notifyListeners();
   }
 
@@ -62,27 +93,22 @@ class UserDataProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('last_logged_in_user');
     _userData = null;
+    _transactions = [];
     _isLoggedIn = false;
     notifyListeners();
   }
 
-  // Fungsi aman untuk verifikasi PIN
   Future<bool> verifyPin(String enteredPin) async {
     if (_userData == null) return false;
-
-    // Mensimulasikan proses dekripsi dan perbandingan yang aman.
-    // Di aplikasi nyata, proses ini mungkin terjadi di backend
-    // atau menggunakan metode dekripsi yang sesuai di klien.
     try {
       final storedEncryptedPin = _userData!.pin;
       final decodedPin = utf8.decode(base64.decode(storedEncryptedPin));
       return decodedPin == enteredPin;
     } catch (e) {
-      return false; // Gagal decode, berarti PIN tidak cocok
+      return false;
     }
   }
 
-  // Fungsi untuk menambah saldo dan menyimpannya
   Future<void> addBalance(double amount) async {
     if (_userData != null) {
       final prefs = await SharedPreferences.getInstance();
@@ -102,20 +128,100 @@ class UserDataProvider with ChangeNotifier {
           final updatedUsersJson = json.encode(registeredUsers);
           await prefs.setString('registered_users', updatedUsersJson);
 
-          // Perbarui objek _userData saat ini juga
-          _userData = UserData(
-            name: _userData!.name,
-            email: _userData!.email,
-            cardNumber: _userData!.cardNumber,
-            balance: newBalance,
-            phoneNumber: _userData!.phoneNumber,
-            address: _userData!.address,
-            accountNumber: _userData!.accountNumber,
-            pin: _userData!.pin,
+          _userData = _userData!.copyWith(balance: newBalance);
+
+          final transaction = TransactionData(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            description: 'Top Up Saldo',
+            amount: amount,
+            category: 'Pemasukan',
+            date: DateTime.now(),
           );
+          await addTransaction(transaction);
+        }
+      }
+    }
+  }
+
+  Future<bool> transferBalance(double amount, String recipientName) async {
+    if (_userData != null && _userData!.balance >= amount) {
+      final prefs = await SharedPreferences.getInstance();
+      final usersJson = prefs.getString('registered_users');
+      if (usersJson != null) {
+        final Map<String, dynamic> decodedMap = json.decode(usersJson);
+        final registeredUsers = decodedMap.map(
+          (key, value) => MapEntry(key, Map<String, String>.from(value)),
+        );
+
+        if (registeredUsers.containsKey(_userData!.email)) {
+          final currentUser = registeredUsers[_userData!.email]!;
+          final currentBalance = double.parse(currentUser['balance'] ?? '0');
+          final newBalance = currentBalance - amount;
+          currentUser['balance'] = newBalance.toString();
+
+          final updatedUsersJson = json.encode(registeredUsers);
+          await prefs.setString('registered_users', updatedUsersJson);
+
+          _userData = _userData!.copyWith(balance: newBalance);
+
+          final transaction = TransactionData(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            description: 'Transfer ke $recipientName',
+            amount: -amount,
+            category: 'Transfer',
+            date: DateTime.now(),
+            recipientName: recipientName,
+          );
+          await addTransaction(transaction);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  Future<void> updateUserName(String newName) async {
+    if (_userData != null) {
+      final prefs = await SharedPreferences.getInstance();
+      final usersJson = prefs.getString('registered_users');
+      if (usersJson != null) {
+        final Map<String, dynamic> decodedMap = json.decode(usersJson);
+        final registeredUsers = decodedMap.map(
+          (key, value) => MapEntry(key, Map<String, String>.from(value)),
+        );
+
+        if (registeredUsers.containsKey(_userData!.email)) {
+          registeredUsers[_userData!.email]!['name'] = newName;
+          await prefs.setString('registered_users', json.encode(registeredUsers));
+          _userData = _userData!.copyWith(name: newName);
           notifyListeners();
         }
       }
     }
+  }
+
+  Future<bool> updatePassword(
+      String currentPassword, String newPassword) async {
+    if (_userData != null) {
+      final prefs = await SharedPreferences.getInstance();
+      final usersJson = prefs.getString('registered_users');
+      if (usersJson != null) {
+        final Map<String, dynamic> decodedMap = json.decode(usersJson);
+        final registeredUsers = decodedMap.map(
+          (key, value) => MapEntry(key, Map<String, String>.from(value)),
+        );
+
+        if (registeredUsers.containsKey(_userData!.email)) {
+          final storedPassword = registeredUsers[_userData!.email]!['password'];
+          if (storedPassword == currentPassword) {
+            registeredUsers[_userData!.email]!['password'] = newPassword;
+            await prefs.setString(
+                'registered_users', json.encode(registeredUsers));
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 }
