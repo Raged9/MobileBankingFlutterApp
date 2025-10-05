@@ -30,16 +30,31 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Color.fromARGB(255, 34, 85, 155),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-          children: const [
-            Header(),
-            SizedBox(height: 24),
-            BalanceCard(),
-            SizedBox(height: 30),
-            QuickActions(),
+        bottom: false,
+        child: Column(
+          children: [
+            const Header(),
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30.0),
+                    topRight: Radius.circular(30.0),
+                  ),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: ListView(
+                  padding: const EdgeInsets.all(20.0),
+                  children: const [
+                    BalanceCard(),
+                    QuickActions(),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -52,12 +67,12 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue.shade700,
+        selectedItemColor: Color.fromARGB(255, 34, 85, 155),
         unselectedItemColor: Colors.grey.shade600,
         onTap: _onItemTapped,
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey.shade200,
         elevation: 5.0,
       ),
     );

@@ -1,5 +1,3 @@
-// File: lib/add_balance_screen.dart
-
 import 'package:flutter/material.dart';
 
 class AddBalanceScreen extends StatelessWidget {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/login.dart';
 import '../models/user_data.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -68,18 +69,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onChanged: (value) {
                   setState(() {
                     _notificationsEnabled = value;
-                  });
-                },
-              ),
-              _buildDivider(),
-              _buildSwitchTile(
-                icon: Icons.dark_mode_outlined,
-                title: 'Dark Mode',
-                subtitle: 'Toggle dark theme',
-                value: _darkModeEnabled,
-                onChanged: (value) {
-                  setState(() {
-                    _darkModeEnabled = value;
                   });
                 },
               ),
@@ -176,7 +165,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey,
             spreadRadius: 1,
             blurRadius: 10,
             offset: const Offset(0, 2),
@@ -281,11 +270,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Cashless App'),
+            Text('MBanking-HelloBank_App'),
             SizedBox(height: 8),
             Text('Version 1.0.0'),
             SizedBox(height: 8),
-            Text('Digital wallet for easy payments'),
+            Text('Digital bank for easy payments'),
           ],
         ),
         actions: [
@@ -311,8 +300,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+                (Route<dynamic> route) => false,
+              );
             },
             child: const Text(
               'Logout',
