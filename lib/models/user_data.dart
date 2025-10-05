@@ -5,6 +5,7 @@ class UserData {
   final double balance;
   final String phoneNumber;
   final String address;
+  final String accountNumber;
 
   UserData({
     required this.name,
@@ -13,6 +14,7 @@ class UserData {
     required this.balance,
     required this.phoneNumber,
     required this.address,
+    required this.accountNumber,
   });
 }
 
@@ -23,4 +25,6 @@ var userData = UserData(
   balance: 0,
   phoneNumber: '',
   address: '',
+  accountNumber: '',
 );
+

@@ -1,7 +1,12 @@
+import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_data.dart';
-import '../screens/home_screen.dart';
+import '../providers/user_data_provider.dart';
+import 'home_screen.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,8 +16,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
-  static final Map<String, Map<String, String>> _registeredUser = {};
+  Map<String, Map<String, String>> _registeredUsers = {};
 
   bool _isLoginForm = true;
   int _loginAttempts = 0;
@@ -26,6 +30,12 @@ class _LoginPageState extends State<LoginPage> {
   final _nameController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _loadRegisteredUsers();
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
@@ -35,16 +45,51 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  Future<void> _loadRegisteredUsers() async {
+    final prefs = await SharedPreferences.getInstance();
+    final usersJson = prefs.getString('registered_users');
+    if (usersJson != null) {
+      setState(() {
+        final Map<String, dynamic> decodedMap = json.decode(usersJson);
+        _registeredUsers = decodedMap.map(
+          (key, value) => MapEntry(key, Map<String, String>.from(value)),
+        );
+      });
+    }
+  }
+
+  Future<void> _saveRegisteredUsers() async {
+    final prefs = await SharedPreferences.getInstance();
+    final usersJson = json.encode(_registeredUsers);
+    await prefs.setString('registered_users', usersJson);
+  }
+
+  String _generateAccountNumber() {
+    final random = Random();
+    const fixedPrefix = '77777';
+    String randomNumber = '';
+    // Membuat 9 digit angka acak
+    for (int i = 0; i < 9; i++) {
+      randomNumber += random.nextInt(10).toString();
+    }
+    return fixedPrefix + randomNumber;
+  }
+
   void _handleRegister() {
     if (_registerFormKey.currentState!.validate()) {
+      final accountNumber = _generateAccountNumber();
       setState(() {
-      _registeredUser[_emailController.text] = {
-      'name': _nameController.text,
-      'password': _passwordController.text,
-      'pin': _pinController.text,
-      'nik': _nikController.text,
-    };
-  });
+        _registeredUsers[_emailController.text] = {
+          'name': _nameController.text,
+          'password': _passwordController.text,
+          'pin': _pinController.text,
+          'nik': _nikController.text,
+          'balance': '0', // Saldo awal
+          'accountNumber': accountNumber, // Nomor rekening baru
+        };
+      });
+
+      _saveRegisteredUsers();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -61,22 +106,25 @@ class _LoginPageState extends State<LoginPage> {
       final email = _emailController.text;
       final password = _passwordController.text;
 
-      if (_registeredUser.containsKey(email) && _registeredUser[email]!['password'] == password) {
+      if (_registeredUsers.containsKey(email) &&
+          _registeredUsers[email]!['password'] == password) {
         _loginAttempts = 0;
-        
-        final userName = _registeredUser[email]!['name'] ?? 'Pengguna';
-
-        userData = UserData(
-          name: userName,
+        final userData = _registeredUsers[email]!;
+        final currentUser = UserData(
+          name: userData['name'] ?? 'Pengguna',
           email: email,
           cardNumber: '**** **** **** 1234',
-          balance: 0,
+          balance: double.parse(userData['balance'] ?? '0'),
           phoneNumber: '+62 812 3456 7890',
           address: 'Jakarta, Indonesia',
+          accountNumber: userData['accountNumber'] ?? '',
         );
 
+        Provider.of<UserDataProvider>(context, listen: false).loginUser(currentUser);
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login Berhasil!'), backgroundColor: Colors.green),
+          const SnackBar(
+              content: Text('Login Berhasil!'), backgroundColor: Colors.green),
         );
 
         Navigator.of(context).pushReplacement(
@@ -87,28 +135,12 @@ class _LoginPageState extends State<LoginPage> {
           _loginAttempts++;
         });
 
-        if (_loginAttempts >= 3) {
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: const Text('Login Gagal'),
-              content: const Text('Anda telah gagal login 3 kali. Akun diblokir sementara.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text('OK'),
-                )
-              ],
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Email atau password salah. Percobaan ke-$_loginAttempts.'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Email atau password salah. Percobaan ke-$_loginAttempts.'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -171,44 +203,6 @@ class _LoginPageState extends State<LoginPage> {
             child: const Text('LOGIN'),
           ),
           const SizedBox(height: 12),
-          OutlinedButton.icon(
-            icon: const Icon(Icons.fingerprint),
-            label: const Text('Gunakan Sidik Jari'),
-            onPressed: () {
-              if (_registeredUser.isNotEmpty) {
-                final email = _registeredUser.keys.first;
-                final userName = _registeredUser[email]!['name'] ?? 'Pengguna';
-
-                userData = UserData(
-                  name: userName,
-                  email: email,
-                  cardNumber: '**** **** **** 1234',
-                  balance: 0,
-                  phoneNumber: '+62 812 3456 7890',
-                  address: 'Jakarta, Indonesia',
-                );
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Login Sidik Jari Berhasil!'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const HomePage()),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Belum ada akun terdaftar!'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-          ),
-          const SizedBox(height: 12),
           TextButton(
             onPressed: _toggleForm,
             child: const Text('Belum punya akun? Daftar di sini'),
@@ -227,7 +221,6 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           Text('Buat Akun Baru', style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 24),
-
           TextFormField(
             controller: _nameController,
             decoration: const InputDecoration(hintText: 'Nama Lengkap'),
@@ -235,7 +228,6 @@ class _LoginPageState extends State<LoginPage> {
             validator: (value) => value!.isEmpty ? 'Nama tidak boleh kosong' : null,
           ),
           const SizedBox(height: 8),
-
           TextFormField(
             controller: _emailController,
             decoration: const InputDecoration(hintText: 'Email'),

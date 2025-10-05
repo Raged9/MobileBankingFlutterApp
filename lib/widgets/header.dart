@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/user_data.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_data_provider.dart';
 import '../screens/settings_screen.dart';
 
 class Header extends StatelessWidget {
@@ -14,6 +15,7 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userData = Provider.of<UserDataProvider>(context).userData;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
       child: Row(
@@ -51,20 +53,19 @@ class Header extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Mr/Mrs. ${userData.name}',
+                'Mr/Mrs. ${userData?.name ?? ''}',
                 style: const TextStyle(color: Colors.white, fontSize: 24),
               ),
             ],
           ),
           IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white, size: 24),
-            onPressed: () => _navigateToSettings(context),
-            style: IconButton.styleFrom(
-              backgroundColor: Color.fromARGB(255, 21, 68, 133),
-              padding: const EdgeInsets.all(8.0),
-              shape: const CircleBorder(),
-            )
-          ),
+              icon: const Icon(Icons.settings, color: Colors.white, size: 24),
+              onPressed: () => _navigateToSettings(context),
+              style: IconButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 21, 68, 133),
+                padding: const EdgeInsets.all(8.0),
+                shape: const CircleBorder(),
+              )),
         ],
       ),
     );

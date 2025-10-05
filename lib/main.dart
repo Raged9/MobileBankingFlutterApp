@@ -1,30 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'providers/user_data_provider.dart';
 import 'screens/login.dart';
-import 'screens/home_screen.dart';
+import 'screens/pin_screen.dart'; // Buat file ini jika belum ada
 
-void main() async {
-  // Pastikan Flutter siap sebelum menjalankan kode async
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Periksa status login dari penyimpanan
-  final prefs = await SharedPreferences.getInstance();
-  final bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
-  runApp(MobileBankingApp(isLoggedIn: isLoggedIn));
+void main() {
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => UserDataProvider()..checkLoginStatus(),
+      child: const MobileBankingApp(),
+    ),
+  );
 }
 
 class MobileBankingApp extends StatelessWidget {
-  final bool isLoggedIn;
-
-  const MobileBankingApp({super.key, required this.isLoggedIn});
+  const MobileBankingApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Mobile Banking App',
       debugShowCheckedModeBanner: false,
-      home: isLoggedIn ? const HomePage() : const LoginPage(),
+      home: Consumer<UserDataProvider>(
+        builder: (context, userDataProvider, child) {
+          // Kita perlu menunggu pengecekan login selesai
+          if (userDataProvider.isLoggedIn) {
+            // Jika sudah pernah login, tampilkan PIN screen
+            return const PinScreen();
+          } else {
+            // Jika belum, tampilkan Login screen
+            return const LoginPage();
+          }
+        },
+      ),
     );
   }
 }

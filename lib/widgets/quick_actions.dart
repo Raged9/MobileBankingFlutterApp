@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/AddBalanceScreen.dart';
+import '../screens/add_balance_screen.dart'; // Nama file diperbarui
 import '../screens/PindahDanaScreen.dart';
 
 class QuickActions extends StatelessWidget {
@@ -27,7 +27,8 @@ class QuickActions extends StatelessWidget {
                 icon: Icons.add,
                 label: 'Top Up',
                 onTap: () {
-                  Navigator.push(context,
+                  Navigator.push(
+                    context,
                     MaterialPageRoute(builder: (context) => const AddBalanceScreen()),
                   );
                 },
@@ -39,8 +40,9 @@ class QuickActions extends StatelessWidget {
                 context: context,
                 icon: Icons.send,
                 label: 'Transfer',
-              onTap: () {
-                  Navigator.push(context,
+                onTap: () {
+                  Navigator.push(
+                    context,
                     MaterialPageRoute(builder: (context) => const PindahDanaScreen()),
                   );
                 },
@@ -75,7 +77,7 @@ class QuickActions extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(icon, size: 30, color: Color.fromARGB(255, 34, 85, 155)),
+            Icon(icon, size: 30, color: const Color.fromARGB(255, 34, 85, 155)),
             const SizedBox(height: 8),
             Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
           ],
