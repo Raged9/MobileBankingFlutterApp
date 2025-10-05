@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
-import '../screens/placeholder_page.dart';
+import '../screens/AddBalanceScreen.dart';
+import '../screens/PindahDanaScreen.dart';
 
 class QuickActions extends StatelessWidget {
   const QuickActions({super.key});
-
-  void _navigateToNewPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const PlaceholderPage()),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +11,7 @@ class QuickActions extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Quick Actions',
+          'Transaksi',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -32,7 +26,11 @@ class QuickActions extends StatelessWidget {
                 context: context,
                 icon: Icons.add,
                 label: 'Top Up',
-                onTap: () => _navigateToNewPage(context),
+                onTap: () {
+                  Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const AddBalanceScreen()),
+                  );
+                },
               ),
             ),
             const SizedBox(width: 16),
@@ -41,7 +39,11 @@ class QuickActions extends StatelessWidget {
                 context: context,
                 icon: Icons.send,
                 label: 'Transfer',
-                onTap: () => _navigateToNewPage(context),
+              onTap: () {
+                  Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const PindahDanaScreen()),
+                  );
+                },
               ),
             ),
           ],
@@ -65,7 +67,7 @@ class QuickActions extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.shade500,
+              color: Colors.grey.shade400,
               spreadRadius: 0.5,
               blurRadius: 2,
             ),
@@ -73,7 +75,7 @@ class QuickActions extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(icon, size: 30, color: Colors.blue.shade700),
+            Icon(icon, size: 30, color: Color.fromARGB(255, 34, 85, 155)),
             const SizedBox(height: 8),
             Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
           ],

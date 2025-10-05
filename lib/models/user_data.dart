@@ -16,11 +16,11 @@ class UserData {
   });
 }
 
-final userData = UserData(
+var userData = UserData(
   name: '',
-  email: 'ronald.suchanto@email.com',
+  email: '',
   cardNumber: '**** **** **** 1234',
   balance: 0,
-  phoneNumber: '+62 812 3456 7890',
-  address: 'Jakarta, Indonesia',
+  phoneNumber: '',
+  address: '',
 );
