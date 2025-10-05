@@ -99,7 +99,6 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  /// Fungsi untuk membuat kartu portofolio
   Widget _buildCard({
     required String title,
     required String accountName,

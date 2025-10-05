@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/login.dart';
 import 'screens/home_screen.dart';
+import 'common/theme.dart';
 
 void main() async {
   // Pastikan Flutter siap sebelum menjalankan kode async
@@ -24,6 +25,7 @@ class MobileBankingApp extends StatelessWidget {
     return MaterialApp(
       title: 'Mobile Banking App',
       debugShowCheckedModeBanner: false,
+      theme: appTheme,
       home: isLoggedIn ? const HomePage() : const LoginPage(),
     );
   }

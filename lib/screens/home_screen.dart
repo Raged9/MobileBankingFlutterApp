@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../widgets/balance_card.dart';
 import '../widgets/header.dart';
 import '../widgets/quick_actions.dart';
+import '../widgets/promo.dart';
+import '../screens/profile_page.dart';
 import 'placeholder_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,7 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
+  final int _selectedIndex = 0;
 
   void _navigateToNewPage() {
     Navigator.push(
@@ -20,10 +22,20 @@ class _HomePageState extends State<HomePage> {
       MaterialPageRoute(builder: (context) => const PlaceholderPage()),
     );
   }
-
   void _onItemTapped(int index) {
-    if (index != _selectedIndex) {
-      _navigateToNewPage();
+    if (index == _selectedIndex) return;
+
+    if (index == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfilePage()),
+      );
+    }
+    else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const PlaceholderPage()),
+      );
     }
   }
 
@@ -51,6 +63,8 @@ class _HomePageState extends State<HomePage> {
                   children: const [
                     BalanceCard(),
                     QuickActions(),
+                    SizedBox(height: 18.0),
+                    PromoSlider(),
                   ],
                 ),
               ),
