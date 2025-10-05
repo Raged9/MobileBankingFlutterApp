@@ -15,6 +15,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
     viewportFraction: 0.3,
   );
   late int selectedMonth;
+  final TextEditingController _searchController = TextEditingController();
 
   Map<String, dynamic>? _activeFilters;
 
@@ -43,24 +44,48 @@ class _TransactionScreenState extends State<TransactionScreen> {
   void initState() {
     super.initState();
     selectedMonth = DateTime.now().month;
+    _searchController.addListener(_runFiltersAndSearch);
     _resetAndFetchTransactions();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
   
   void _resetAndFetchTransactions() {
-    List<Map<String, dynamic>> baseList = allTransactions[selectedMonth] ?? [];
-    if (_activeFilters != null) {
-      _applyFilters(_activeFilters!, listToFilter: baseList);
-    } else {
-      setState(() {
-        currentTransactions = baseList;
-      });
-    }
+    setState(() {
+      _activeFilters = null;
+      _searchController.clear();
+      _runFiltersAndSearch();
+    });
   }
 
-  void _applyFilters(Map<String, dynamic> filters, {List<Map<String, dynamic>>? listToFilter}) {
-    _activeFilters = filters;
+  void _runFiltersAndSearch() {
+    List<Map<String, dynamic>> baseList = allTransactions[selectedMonth] ?? [];
+    List<Map<String, dynamic>> filteredList = List.from(baseList);
 
-    List<Map<String, dynamic>> filteredList = List.from(listToFilter ?? allTransactions[selectedMonth] ?? []);
+    // Apply existing filters
+    if (_activeFilters != null) {
+      filteredList = _applyFiltersToData(_activeFilters!, listToFilter: baseList);
+    }
+    
+    // Apply search query
+    final query = _searchController.text.toLowerCase();
+    if (query.isNotEmpty) {
+      filteredList = filteredList.where((transaction) {
+        return transaction['desc'].toLowerCase().contains(query);
+      }).toList();
+    }
+
+    setState(() {
+      currentTransactions = filteredList;
+    });
+  }
+
+  List<Map<String, dynamic>> _applyFiltersToData(Map<String, dynamic> filters, {required List<Map<String, dynamic>> listToFilter}) {
+    List<Map<String, dynamic>> filteredList = List.from(listToFilter);
 
     final DateTime? startDate = filters['startDate'];
     final DateTime? endDate = filters['endDate'];
@@ -87,10 +112,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
     if (categories.isNotEmpty && !categories.contains("Semua Kategori")) {
       filteredList = filteredList.where((t) => categories.contains(t['category'])).toList();
     }
-
-    setState(() {
-      currentTransactions = filteredList;
-    });
+    return filteredList;
   }
 
   @override
@@ -106,13 +128,13 @@ class _TransactionScreenState extends State<TransactionScreen> {
               onPressed: () {
                 setState(() {
                   _activeFilters = null;
-                  currentTransactions = allTransactions[selectedMonth] ?? [];
+                  _runFiltersAndSearch();
                 });
               },
             ),
           IconButton(
             tooltip: "Filter Transaksi",
-            icon: const Icon(Icons.search),
+            icon: const Icon(Icons.filter_list),
             onPressed: () async {
               final filterResult = await Navigator.push(
                 context,
@@ -120,7 +142,10 @@ class _TransactionScreenState extends State<TransactionScreen> {
               );
 
               if (filterResult != null && filterResult is Map<String, dynamic>) {
-                _applyFilters(filterResult);
+                setState(() {
+                  _activeFilters = filterResult;
+                  _runFiltersAndSearch();
+                });
               }
             },
           ),
@@ -135,7 +160,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
               onPageChanged: (index) {
                 setState(() {
                   selectedMonth = index + 1;
-                  _resetAndFetchTransactions();
+                  _runFiltersAndSearch();
                 });
               },
               itemCount: 12,
@@ -152,6 +177,22 @@ class _TransactionScreenState extends State<TransactionScreen> {
                   ),
                 );
               },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Cari transaksi...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.grey[200],
+              ),
             ),
           ),
           const Divider(),

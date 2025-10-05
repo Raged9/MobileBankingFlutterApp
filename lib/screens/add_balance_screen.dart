@@ -12,6 +12,7 @@ class AddBalanceScreen extends StatefulWidget {
 
 class _AddBalanceScreenState extends State<AddBalanceScreen> {
   final _amountController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -19,11 +20,21 @@ class _AddBalanceScreenState extends State<AddBalanceScreen> {
     super.dispose();
   }
 
-  void _addBalance() {
+  void _addBalance() async {
     if (_amountController.text.isNotEmpty) {
       final amount = double.tryParse(_amountController.text.replaceAll('.', ''));
       if (amount != null && amount > 0) {
-        Provider.of<UserDataProvider>(context, listen: false).addBalance(amount);
+        setState(() {
+          _isLoading = true;
+        });
+
+        // Simulasikan penundaan jaringan
+        await Future.delayed(const Duration(seconds: 1));
+
+        if (!mounted) return;
+
+        await Provider.of<UserDataProvider>(context, listen: false).addBalance(amount);
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Saldo berhasil ditambahkan: Rp ${NumberFormat('#,##0', 'id_ID').format(amount)}'),
@@ -31,6 +42,13 @@ class _AddBalanceScreenState extends State<AddBalanceScreen> {
           ),
         );
         Navigator.of(context).pop();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Jumlah tidak valid.'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -75,10 +93,12 @@ class _AddBalanceScreenState extends State<AddBalanceScreen> {
                 ),
               ),
               const SizedBox(width: 10),
-              IconButton(
-                icon: const Icon(Icons.add_circle, size: 40, color: Colors.blue),
-                onPressed: _addBalance,
-              ),
+              _isLoading
+                  ? const CircularProgressIndicator()
+                  : IconButton(
+                      icon: const Icon(Icons.add_circle, size: 40, color: Colors.blue),
+                      onPressed: _addBalance,
+                    ),
             ],
           ),
           const SizedBox(height: 24),

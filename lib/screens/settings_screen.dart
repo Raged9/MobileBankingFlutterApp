@@ -12,6 +12,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
+  bool _biometricEnabled = false;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +69,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   setState(() {
                     _notificationsEnabled = value;
                   });
+                },
+              ),
+              _buildDivider(),
+              _buildSwitchTile(
+                icon: Icons.fingerprint,
+                title: 'Biometric Login',
+                subtitle: 'Use fingerprint or face ID to login',
+                value: _biometricEnabled,
+                onChanged: (value) {
+                  // Untuk implementasi nyata, Anda akan menggunakan package
+                  // seperti 'local_auth' dan menyimpan preferensi ini.
+                  setState(() {
+                    _biometricEnabled = value;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Login biometrik ${value ? "diaktifkan" : "dinonaktifkan"}.'),
+                      backgroundColor: Colors.blue,
+                    ),
+                  );
                 },
               ),
             ]),
@@ -165,7 +186,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey,
+            color: Colors.grey.withOpacity(0.2),
             spreadRadius: 1,
             blurRadius: 10,
             offset: const Offset(0, 2),

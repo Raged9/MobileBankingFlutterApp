@@ -6,6 +6,7 @@ class UserData {
   final String phoneNumber;
   final String address;
   final String accountNumber;
+  final String pin;
 
   UserData({
     required this.name,
@@ -15,6 +16,7 @@ class UserData {
     required this.phoneNumber,
     required this.address,
     required this.accountNumber,
+    required this.pin,
   });
 }
 
@@ -26,5 +28,6 @@ var userData = UserData(
   phoneNumber: '',
   address: '',
   accountNumber: '',
+  pin: '',
 );
 

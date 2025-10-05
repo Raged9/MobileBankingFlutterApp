@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _isLoginForm = true;
   int _loginAttempts = 0;
+  bool _isLockedOut = false;
 
   final _loginFormKey = GlobalKey<FormState>();
   final _registerFormKey = GlobalKey<FormState>();
@@ -68,7 +70,6 @@ class _LoginPageState extends State<LoginPage> {
     final random = Random();
     const fixedPrefix = '77777';
     String randomNumber = '';
-    // Membuat 9 digit angka acak
     for (int i = 0; i < 9; i++) {
       randomNumber += random.nextInt(10).toString();
     }
@@ -78,14 +79,22 @@ class _LoginPageState extends State<LoginPage> {
   void _handleRegister() {
     if (_registerFormKey.currentState!.validate()) {
       final accountNumber = _generateAccountNumber();
+      //
+      // CATATAN KEAMANAN:
+      // PIN tidak boleh disimpan sebagai plain text.
+      // Gunakan library enkripsi yang kuat seperti 'flutter_secure_storage'
+      // atau 'encrypt' untuk mengenkripsi PIN sebelum disimpan.
+      // Di sini, kita menggunakan Base64 sebagai placeholder untuk proses enkripsi.
+      final encryptedPin = base64.encode(utf8.encode(_pinController.text));
+
       setState(() {
         _registeredUsers[_emailController.text] = {
           'name': _nameController.text,
           'password': _passwordController.text,
-          'pin': _pinController.text,
+          'pin': encryptedPin, // Simpan PIN yang sudah di-"enkripsi"
           'nik': _nikController.text,
-          'balance': '0', // Saldo awal
-          'accountNumber': accountNumber, // Nomor rekening baru
+          'balance': '0',
+          'accountNumber': accountNumber,
         };
       });
 
@@ -102,6 +111,16 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _handleLogin() {
+    if (_isLockedOut) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Akun Anda terkunci sementara. Coba lagi nanti.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     if (_loginFormKey.currentState!.validate()) {
       final email = _emailController.text;
       final password = _passwordController.text;
@@ -111,16 +130,18 @@ class _LoginPageState extends State<LoginPage> {
         _loginAttempts = 0;
         final userData = _registeredUsers[email]!;
         final currentUser = UserData(
-          name: userData['name'] ?? 'Pengguna',
-          email: email,
-          cardNumber: '**** **** **** 1234',
-          balance: double.parse(userData['balance'] ?? '0'),
-          phoneNumber: '+62 812 3456 7890',
-          address: 'Jakarta, Indonesia',
-          accountNumber: userData['accountNumber'] ?? '',
-        );
+            name: userData['name'] ?? 'Pengguna',
+            email: email,
+            cardNumber: '**** **** **** 1234',
+            balance: double.parse(userData['balance'] ?? '0'),
+            phoneNumber: '+62 812 3456 7890',
+            address: 'Jakarta, Indonesia',
+            accountNumber: userData['accountNumber'] ?? '',
+            // PIN yang disimpan adalah yang sudah dienkripsi
+            pin: userData['pin'] ?? '');
 
-        Provider.of<UserDataProvider>(context, listen: false).loginUser(currentUser);
+        Provider.of<UserDataProvider>(context, listen: false)
+            .loginUser(currentUser);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -135,9 +156,24 @@ class _LoginPageState extends State<LoginPage> {
           _loginAttempts++;
         });
 
+        String message = 'Email atau password salah.';
+        if (_loginAttempts >= 3) {
+          message += ' Percobaan ke-$_loginAttempts. Setelah 5x gagal, akun akan dikunci.';
+        }
+        if (_loginAttempts >= 5) {
+          message = 'Anda telah 5x gagal login. Akun dikunci selama 30 detik.';
+          _isLockedOut = true;
+          Timer(const Duration(seconds: 30), () {
+            setState(() {
+              _isLockedOut = false;
+              _loginAttempts = 0;
+            });
+          });
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Email atau password salah. Percobaan ke-$_loginAttempts.'),
+            content: Text(message),
             backgroundColor: Colors.red,
           ),
         );
@@ -154,6 +190,17 @@ class _LoginPageState extends State<LoginPage> {
       _pinController.clear();
       _nameController.clear();
     });
+  }
+  
+  void _showBiometricPrompt() {
+    // Placeholder untuk fungsionalitas biometrik.
+    // Untuk implementasi nyata, gunakan package seperti 'local_auth'.
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Fitur biometrik belum diimplementasikan.'),
+        backgroundColor: Colors.blue,
+      ),
+    );
   }
 
   @override
@@ -182,20 +229,23 @@ class _LoginPageState extends State<LoginPage> {
         key: const ValueKey('login'),
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Selamat Datang', style: Theme.of(context).textTheme.headlineMedium),
+          Text('Selamat Datang',
+              style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 24),
           TextFormField(
             controller: _emailController,
             decoration: const InputDecoration(hintText: 'Email'),
             keyboardType: TextInputType.emailAddress,
-            validator: (value) => value!.isEmpty ? 'Email tidak boleh kosong' : null,
+            validator: (value) =>
+                value!.isEmpty ? 'Email tidak boleh kosong' : null,
           ),
           const SizedBox(height: 8),
           TextFormField(
             controller: _passwordController,
             decoration: const InputDecoration(hintText: 'Password'),
             obscureText: true,
-            validator: (value) => value!.isEmpty ? 'Password tidak boleh kosong' : null,
+            validator: (value) =>
+                value!.isEmpty ? 'Password tidak boleh kosong' : null,
           ),
           const SizedBox(height: 24),
           ElevatedButton(
@@ -206,6 +256,13 @@ class _LoginPageState extends State<LoginPage> {
           TextButton(
             onPressed: _toggleForm,
             child: const Text('Belum punya akun? Daftar di sini'),
+          ),
+          const SizedBox(height: 20),
+          const Text("atau masuk dengan"),
+          const SizedBox(height: 12),
+          IconButton(
+            icon: const Icon(Icons.fingerprint, size: 40),
+            onPressed: _showBiometricPrompt,
           ),
         ],
       ),
@@ -219,27 +276,31 @@ class _LoginPageState extends State<LoginPage> {
         key: const ValueKey('register'),
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Buat Akun Baru', style: Theme.of(context).textTheme.headlineMedium),
+          Text('Buat Akun Baru',
+              style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 24),
           TextFormField(
             controller: _nameController,
             decoration: const InputDecoration(hintText: 'Nama Lengkap'),
             keyboardType: TextInputType.name,
-            validator: (value) => value!.isEmpty ? 'Nama tidak boleh kosong' : null,
+            validator: (value) =>
+                value!.isEmpty ? 'Nama tidak boleh kosong' : null,
           ),
           const SizedBox(height: 8),
           TextFormField(
             controller: _emailController,
             decoration: const InputDecoration(hintText: 'Email'),
             keyboardType: TextInputType.emailAddress,
-            validator: (value) => value!.isEmpty ? 'Email tidak boleh kosong' : null,
+            validator: (value) =>
+                value!.isEmpty ? 'Email tidak boleh kosong' : null,
           ),
           const SizedBox(height: 8),
           TextFormField(
             controller: _passwordController,
             decoration: const InputDecoration(hintText: 'Password'),
             obscureText: true,
-            validator: (value) => value!.isEmpty ? 'Password tidak boleh kosong' : null,
+            validator: (value) =>
+                value!.isEmpty ? 'Password tidak boleh kosong' : null,
           ),
           const SizedBox(height: 8),
           TextFormField(
@@ -250,7 +311,8 @@ class _LoginPageState extends State<LoginPage> {
               FilteringTextInputFormatter.digitsOnly,
               LengthLimitingTextInputFormatter(16),
             ],
-            validator: (value) => value!.length < 16 ? 'NIK harus 16 digit' : null,
+            validator: (value) =>
+                value!.length < 16 ? 'NIK harus 16 digit' : null,
           ),
           const SizedBox(height: 8),
           TextFormField(

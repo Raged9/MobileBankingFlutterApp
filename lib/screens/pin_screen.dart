@@ -1,28 +1,66 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
 
-class PinScreen extends StatefulWidget {
-  const PinScreen({super.key});
+class PinVerificationScreen extends StatefulWidget {
+  // Alih-alih menerima PIN, kita menerima fungsi untuk verifikasi.
+  // Ini lebih aman karena PIN asli tidak pernah diekspos ke UI.
+  final Future<bool> Function(String) onPinVerified;
+  final VoidCallback onVerificationSuccess;
+
+  const PinVerificationScreen({
+    super.key,
+    required this.onPinVerified,
+    required this.onVerificationSuccess,
+  });
 
   @override
-  State<PinScreen> createState() => _PinScreenState();
+  State<PinVerificationScreen> createState() => _PinVerificationScreenState();
 }
 
-class _PinScreenState extends State<PinScreen> {
+class _PinVerificationScreenState extends State<PinVerificationScreen> {
   String _pin = '';
+  int _attempts = 0;
+  bool _isVerifying = false;
 
-  void _onKeyPress(String value) {
+  void _onKeyPress(String value) async {
     if (_pin.length < 6) {
       setState(() {
         _pin += value;
       });
     }
     if (_pin.length == 6) {
-      // For simplicity, we'll just navigate to the home screen.
-      // In a real app, you would verify the PIN.
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+      setState(() {
+        _isVerifying = true;
+      });
+
+      // Panggil fungsi verifikasi dari provider
+      final isCorrect = await widget.onPinVerified(_pin);
+
+      if (!mounted) return;
+
+      if (isCorrect) {
+        widget.onVerificationSuccess();
+      } else {
+        setState(() {
+          _attempts++;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('PIN salah. Sisa percobaan: ${3 - _attempts}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          _pin = ''; // Reset PIN
+        });
+
+        if (_attempts >= 3) {
+          // Aksi jika sudah 3x salah, misal: logout atau kunci sementara
+          Navigator.of(context).pop(false); // Keluar dari layar PIN
+        }
+      }
+      setState(() {
+        _isVerifying = false;
+      });
     }
   }
 
@@ -37,30 +75,45 @@ class _PinScreenState extends State<PinScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Verifikasi PIN'),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        elevation: 0,
+        foregroundColor: Colors.black,
+      ),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Enter your PIN', style: TextStyle(fontSize: 24)),
+            const Spacer(),
+            const Text('Masukkan PIN Transaksi Anda',
+                style: TextStyle(fontSize: 20)),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(6, (index) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: index < _pin.length ? Colors.black : Colors.grey,
+            _isVerifying
+                ? const CircularProgressIndicator()
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(6, (index) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.grey),
+                          color: index < _pin.length
+                              ? Theme.of(context).primaryColor
+                              : Colors.transparent,
+                        ),
+                      );
+                    }),
                   ),
-                );
-              }),
-            ),
-            const SizedBox(height: 40),
+            const Spacer(),
             Expanded(
+              flex: 2,
               child: GridView.builder(
                 padding: const EdgeInsets.all(20),
+                physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   childAspectRatio: 1.5,
@@ -69,18 +122,25 @@ class _PinScreenState extends State<PinScreen> {
                 ),
                 itemCount: 12,
                 itemBuilder: (context, index) {
-                  if (index == 9) return const SizedBox.shrink();
+                  if (index == 9) {
+                    return const SizedBox
+                        .shrink(); // Empty space for aesthetics
+                  }
                   if (index == 11) {
                     return IconButton(
-                      icon: const Icon(Icons.backspace),
+                      icon: const Icon(Icons.backspace_outlined, size: 30),
                       onPressed: _onDelete,
                     );
                   }
                   final number = index == 10 ? 0 : index + 1;
                   return TextButton(
+                    style: TextButton.styleFrom(
+                      shape: const CircleBorder(),
+                    ),
                     child: Text(
                       '$number',
-                      style: const TextStyle(fontSize: 24),
+                      style: const TextStyle(
+                          fontSize: 28, color: Colors.black87),
                     ),
                     onPressed: () => _onKeyPress('$number'),
                   );
