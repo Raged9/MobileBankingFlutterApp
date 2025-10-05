@@ -32,7 +32,7 @@ class Header extends StatelessWidget {
                   RichText(
                     text: const TextSpan(
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 27,
                         fontWeight: FontWeight.w400,
                       ),
                       children: <TextSpan>[

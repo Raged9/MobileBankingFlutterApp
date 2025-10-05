@@ -33,7 +33,7 @@ class _PromoSliderState extends State<PromoSlider> {
   }
 
   void _startAutoScroll() {
-    _timer = Timer.periodic(const Duration(seconds: 4), (Timer timer) { // Geser setiap 4 detik
+    _timer = Timer.periodic(const Duration(seconds: 8), (Timer timer) { // Geser setiap 8 detik
       if (_pageController.hasClients) { 
         if (_currentPage < _promoImages.length - 1) {
           _currentPage++;
