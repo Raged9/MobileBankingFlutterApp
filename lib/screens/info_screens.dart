@@ -12,7 +12,10 @@ class _InfoScreenState extends State<InfoScreen> {
   String _selectedCategory = "Semua Kategori";
 
   final List<String> _categories = [
-    "Semua Kategori", "Info", "Transaksi", "Promo"
+    "Semua Kategori",
+    "Info",
+    "Transaksi",
+    "Promo"
   ];
 
   final List<Map<String, dynamic>> _allInfoItems = [
@@ -23,7 +26,8 @@ class _InfoScreenState extends State<InfoScreen> {
       "date": "12 Sep 2025",
       "subtitle": "Informasi Maintenance Layanan Transaksi e-Banking BCA.",
       "detailContent": {
-        "description": "Akan dilakukan pemeliharaan sistem rutin pada layanan e-Banking BCA untuk meningkatkan kualitas layanan. Selama periode ini, beberapa transaksi mungkin akan mengalami keterlambatan. Mohon maaf atas ketidaknyamanannya."
+        "description":
+            "Akan dilakukan pemeliharaan sistem rutin pada layanan e-Banking BCA untuk meningkatkan kualitas layanan. Selama periode ini, beberapa transaksi mungkin akan mengalami keterlambatan. Mohon maaf atas ketidaknyamanannya."
       }
     },
     {
@@ -33,7 +37,8 @@ class _InfoScreenState extends State<InfoScreen> {
       "date": "09 Sep 2025",
       "subtitle": "Dapatkan cashback maksimal Rp 25.000 untuk transaksi pertama.",
       "detailContent": {
-        "description": "Promo spesial untuk Anda! Nikmati cashback sebesar 20% untuk setiap transaksi di seluruh supermarket partner kami dengan menggunakan QRIS. Promo berlaku hingga akhir bulan ini. Syarat dan ketentuan berlaku."
+        "description":
+            "Promo spesial untuk Anda! Nikmati cashback sebesar 20% untuk setiap transaksi di seluruh supermarket partner kami dengan menggunakan QRIS. Promo berlaku hingga akhir bulan ini. Syarat dan ketentuan berlaku."
       }
     },
     {
@@ -42,8 +47,9 @@ class _InfoScreenState extends State<InfoScreen> {
       "title": "Diskon 50% untuk Kopi Pilihan di Kopi Kenangan",
       "date": "11 Sep 2025",
       "subtitle": "Nikmati promo spesial setiap hari Jumat dengan Kartu Debit BCA.",
-       "detailContent": {
-        "description": "Jumat lebih seru dengan diskon 50% untuk pembelian Americano dan Kopi Susu Gula Aren di seluruh gerai Kopi Kenangan. Cukup tunjukkan kartu Debit BCA Anda saat pembayaran."
+      "detailContent": {
+        "description":
+            "Jumat lebih seru dengan diskon 50% untuk pembelian Americano dan Kopi Susu Gula Aren di seluruh gerai Kopi Kenangan. Cukup tunjukkan kartu Debit BCA Anda saat pembayaran."
       }
     },
     {
@@ -52,7 +58,7 @@ class _InfoScreenState extends State<InfoScreen> {
       "title": "Transfer Masuk",
       "date": "10 Sep 2025",
       "subtitle": "Anda menerima transfer dari Budi Santoso.",
-       "detailContent": {
+      "detailContent": {
         "amount": "500.000",
         "sender": "Budi Santoso",
         "transactionId": "TRX-20250910-00123"
@@ -65,7 +71,8 @@ class _InfoScreenState extends State<InfoScreen> {
       "date": "08 Sep 2025",
       "subtitle": "Simak tips untuk menghindari penipuan.",
       "detailContent": {
-        "description": "Jaga selalu kerahasiaan data pribadi Anda. Jangan pernah memberikan kode OTP, PIN, atau password kepada siapa pun, termasuk pihak yang mengaku dari bank. Keamanan transaksi Anda adalah prioritas kami."
+        "description":
+            "Jaga selalu kerahasiaan data pribadi Anda. Jangan pernah memberikan kode OTP, PIN, atau password kepada siapa pun, termasuk pihak yang mengaku dari bank. Keamanan transaksi Anda adalah prioritas kami."
       }
     },
   ];
@@ -93,14 +100,19 @@ class _InfoScreenState extends State<InfoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Info & Transactions"),
-        automaticallyImplyLeading: false,
+        // Tombol Kembali ditambahkan di sini
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text("Info & Transaksi"),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(

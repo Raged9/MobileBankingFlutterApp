@@ -28,7 +28,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Settings',
+          'Pengaturan',
           style: TextStyle(
             color: Colors.black,
             fontSize: 20,
@@ -41,12 +41,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             const SizedBox(height: 20),
 
-            _buildSectionTitle('Account'),
+            _buildSectionTitle('Akun'),
             _buildSettingsCard([
               _buildSettingsTile(
                 icon: Icons.person_outline,
-                title: 'Edit Profile',
-                subtitle: 'Update your personal information',
+                title: 'Ubah Profil',
+                subtitle: 'Perbarui informasi pribadi Anda',
                 onTap: () {
                   Navigator.push(
                     context,
@@ -57,8 +57,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildDivider(),
               _buildSettingsTile(
                 icon: Icons.lock_outline,
-                title: 'Change Password',
-                subtitle: 'Update your password',
+                title: 'Ubah Kata Sandi',
+                subtitle: 'Perbarui kata sandi Anda',
                 onTap: () {
                   Navigator.push(
                     context,
@@ -70,12 +70,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             const SizedBox(height: 20),
 
-            _buildSectionTitle('Preferences'),
+            _buildSectionTitle('Preferensi'),
             _buildSettingsCard([
               _buildSwitchTile(
                 icon: Icons.notifications_outlined,
-                title: 'Notifications',
-                subtitle: 'Enable push notifications',
+                title: 'Notifikasi',
+                subtitle: 'Aktifkan notifikasi push',
                 value: _notificationsEnabled,
                 onChanged: (value) {
                   setState(() {
@@ -86,12 +86,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildDivider(),
               _buildSwitchTile(
                 icon: Icons.fingerprint,
-                title: 'Biometric Login',
-                subtitle: 'Use fingerprint or face ID to login',
+                title: 'Login Biometrik', 
+                subtitle: 'Gunakan sidik jari atau ID wajah untuk login', 
                 value: _biometricEnabled,
                 onChanged: (value) {
-                  // Untuk implementasi nyata, Anda akan menggunakan package
-                  // seperti 'local_auth' dan menyimpan preferensi ini.
                   setState(() {
                     _biometricEnabled = value;
                   });
@@ -107,12 +105,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             const SizedBox(height: 20),
 
-            _buildSectionTitle('Support'),
+            _buildSectionTitle('Dukungan'),
             _buildSettingsCard([
               _buildSettingsTile(
                 icon: Icons.help_outline,
-                title: 'Help Center',
-                subtitle: 'Get help and support',
+                title: 'Pusat Bantuan',
+                subtitle: 'Dapatkan bantuan dan dukungan',
                 onTap: () {
                   _showSupportCenter();
                 },
@@ -120,8 +118,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildDivider(),
               _buildSettingsTile(
                 icon: Icons.info_outline,
-                title: 'About',
-                subtitle: 'App version and information',
+                title: 'Tentang',
+                subtitle: 'Versi dan informasi aplikasi',
                 onTap: () {
                   _showAboutDialog();
                 },
@@ -129,8 +127,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildDivider(),
               _buildSettingsTile(
                 icon: Icons.privacy_tip_outlined,
-                title: 'Privacy Policy',
-                subtitle: 'Read our privacy policy',
+                title: 'Kebijakan Privasi', 
+                subtitle: 'Baca kebijakan privasi kami',
                 onTap: () {
                   _showPrivacyPolicy();
                 },
@@ -155,7 +153,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   child: const Text(
-                    'Logout',
+                    'Keluar', // Diubah
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -292,22 +290,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('About'),
+        title: const Text('Tentang'), 
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('MBanking-HelloBank_App'),
             SizedBox(height: 8),
-            Text('Version 1.0.0'),
+            Text('Versi 1.0.0'),
             SizedBox(height: 8),
-            Text('Digital bank for easy payments'),
+            Text('Bank digital untuk pembayaran mudah'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('Tutup'), 
           ),
         ],
       ),
@@ -318,12 +316,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Support Center'),
+        title: const Text('Pusat Dukungan'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Please Contact:'),
+            Text('Silakan Hubungi:'),
             SizedBox(height: 8),
             Text('hellobank@gmail.com'),
           ],
@@ -331,30 +329,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('Tutup'),
           ),
         ],
       ),
     );
   }
 
-      void _showPrivacyPolicy() {
+  void _showPrivacyPolicy() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Privacy Policy'),
+        title: const Text('Kebijakan Privasi'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Lorem Ipsum'),
-
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text('Tutup'),
           ),
         ],
       ),
@@ -365,12 +362,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        title: const Text('Keluar'),
+        content: const Text('Apakah Anda yakin ingin keluar?'), 
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text('Batal'),
           ),
           TextButton(
             onPressed: () {
@@ -380,7 +377,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 (Route<dynamic> route) => false,
               );
             },
-            child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            child: const Text('Keluar', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

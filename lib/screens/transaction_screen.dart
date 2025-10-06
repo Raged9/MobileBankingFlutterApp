@@ -1,5 +1,3 @@
-// lib/screens/transaction_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -104,6 +102,12 @@ class _TransactionScreenState extends State<TransactionScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        // Tombol kembali secara otomatis ditambahkan oleh Navigator,
+        // namun bisa dibuat eksplisit seperti ini.
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text("Riwayat Transaksi"),
         actions: [
           if (_activeFilters != null)
