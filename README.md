@@ -18,4 +18,4 @@ HelloBank adalah prototipe aplikasi bank digital (Mobile-Banking) yang memiliki 
 - flutter pub get / get packages di file pubspec.yaml
 3. Connect dan nyalakan VSCode dengan Emulator/Hp agar bisa di-run, lalu run main.dart
 
-
+*Notes : jika anda merasa belum pernah melakukan Daftar atau Lupa pin tetapi anda langsung masuk ke halaman pin, tanpa masuk ke halaman daftar/login silahkan uninstall aplikasi di Emulator anda dan jalankan ulang "flutter run" Kembali di terminal
