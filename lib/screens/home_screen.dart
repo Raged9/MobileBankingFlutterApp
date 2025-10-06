@@ -6,9 +6,9 @@ import '../widgets/header.dart';
 import '../widgets/quick_actions.dart';
 import '../widgets/promo.dart';
 import '../screens/profile_page.dart';
-import 'placeholder_page.dart';
 import 'info_screens.dart';
 import 'transaction_screen.dart';
+import 'qris_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
       case 2: // Item "QRIS"
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const PlaceholderPage()),
+          MaterialPageRoute(builder: (context) => const   QrisScreen()),
         );
         break;
       case 3: // Item "Profile"

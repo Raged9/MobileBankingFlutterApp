@@ -180,6 +180,42 @@ class UserDataProvider with ChangeNotifier {
     return false;
   }
 
+    Future<bool> qrisPayment(double amount, String merchantName) async {
+    if (_userData != null && _userData!.balance >= amount) {
+      final prefs = await SharedPreferences.getInstance();
+      final usersJson = prefs.getString('registered_users');
+      if (usersJson != null) {
+        final Map<String, dynamic> decodedMap = json.decode(usersJson);
+        final registeredUsers = decodedMap.map(
+          (key, value) => MapEntry(key, Map<String, String>.from(value)),
+        );
+
+        if (registeredUsers.containsKey(_userData!.email)) {
+          final currentUser = registeredUsers[_userData!.email]!;
+          final currentBalance = double.parse(currentUser['balance'] ?? '0');
+          final newBalance = currentBalance - amount;
+          currentUser['balance'] = newBalance.toString();
+
+          final updatedUsersJson = json.encode(registeredUsers);
+          await prefs.setString('registered_users', updatedUsersJson);
+
+          _userData = _userData!.copyWith(balance: newBalance);
+
+          final transaction = TransactionData(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            description: 'Bayar di $merchantName',
+            amount: -amount,
+            category: 'Q-RIS',
+            date: DateTime.now(),
+          );
+          await addTransaction(transaction);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   Future<void> updateUserName(String newName) async {
     if (_userData != null) {
       final prefs = await SharedPreferences.getInstance();
