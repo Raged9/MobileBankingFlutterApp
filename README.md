@@ -1,6 +1,6 @@
 # HelloBank
 
-HelloBank adalah prototipe aplikasi bank digital (Mobile-Banking) yang memiliki beberapa fitur sederhana. Aplikasi ini mempunyai beberapa fitur seperti untuk cek saldo, transfer uang, top-up, melihat berita(news), history transaksi, dan melakukan pengaturan(settings) Sebelum masuk ke aplikasi utama, user diharuskan login atau sign up. Tidak hanya itu, ada juga halaman promo untuk melihat event / promo terbaru. Walaupun aplikasi ini hanya memiliki beberapa fitur utama,tetapi tampilannya cukup modern dan mudah dimengerti oleh semua kalangan usia.
+HelloBank adalah prototipe aplikasi bank digital (Mobile-Banking) yang memiliki beberapa fitur sederhana. Aplikasi ini mempunyai beberapa fitur seperti untuk cek saldo, transfer uang, top-up, q-ris(dummy) melihat berita(news), history transaksi, dan melakukan pengaturan(settings) Sebelum masuk ke aplikasi utama, user diharuskan login atau sign up. Tidak hanya itu, ada juga halaman promo untuk melihat event / promo terbaru. Walaupun aplikasi ini hanya memiliki beberapa fitur utama,tetapi tampilannya cukup modern dan mudah dimengerti oleh semua kalangan usia.
 
 ## Disusun oleh :
 

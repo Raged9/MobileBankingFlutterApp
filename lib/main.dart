@@ -23,7 +23,7 @@ class MobileBankingApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Mobile Banking App',
-      theme: appTheme, 
+      theme: appTheme,
       debugShowCheckedModeBanner: false,
       home: const SplashScreen(),
     );
@@ -45,7 +45,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   _navigateToAuthGate() async {
-    await Future.delayed(const Duration(seconds: 3)); // Durasi splash screen
+    await Future.delayed(const Duration(seconds: 3));
     if (mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const AuthGate()),
@@ -56,16 +56,35 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor, 
+      backgroundColor: Theme.of(context).primaryColor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/images/Logo.png', 
+              'assets/images/Logo.png',
               height: 150,
             ),
             const SizedBox(height: 20),
+            Text.rich(
+              TextSpan(
+                style: const TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                ),
+                children: <TextSpan>[
+                  const TextSpan(
+                    text: 'Hello',
+                    style: TextStyle(color: Color.fromARGB(255, 0, 191, 255)),
+                  ),
+                  const TextSpan(
+                    text: 'Bank',
+                    style: TextStyle(color: Color.fromARGB(255, 5, 34, 54)),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
             const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
@@ -75,7 +94,6 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
