@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_data_provider.dart';
+import '../screens/settings_screen.dart'; // 1. Import halaman settings
 
 class Header extends StatelessWidget {
   const Header({super.key});
@@ -17,7 +18,7 @@ class Header extends StatelessWidget {
           Row(
             children: [
               Image.asset(
-                'assets/images/Logo.png', // Path ke logo aplikasi Anda
+                'assets/images/Logo.png',
                 height: 40,
                 width: 40,
               ),
@@ -34,7 +35,7 @@ class Header extends StatelessWidget {
                     ),
                   ),
                   const Text(
-                    'Welcome back!',
+                    'Welcome !',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 14.0,
@@ -44,36 +45,20 @@ class Header extends StatelessWidget {
               ),
             ],
           ),
-          Stack(
-            children: [
-              const Icon(
-                Icons.notifications_none,
-                color: Colors.white,
-                size: 28.0,
-              ),
-              Positioned(
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 12,
-                    minHeight: 12,
-                  ),
-                  child: const Text(
-                    '1', // Angka notifikasi
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 8,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              )
-            ],
+          IconButton(
+            icon: const Icon(Icons.settings, color: Colors.white, size: 24),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+            style: IconButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 21, 68, 133),
+              padding: const EdgeInsets.all(8.0),
+              shape: const CircleBorder(),
+              elevation: 4.0, 
+            ),
           ),
         ],
       ),

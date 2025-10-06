@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../screens/change_password_screen.dart';
+import '../screens/edit_profile_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_data_provider.dart';
 import '../screens/login.dart';
@@ -45,14 +47,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.person_outline,
                 title: 'Edit Profile',
                 subtitle: 'Update your personal information',
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                  );
+                },
               ),
               _buildDivider(),
               _buildSettingsTile(
                 icon: Icons.lock_outline,
                 title: 'Change Password',
                 subtitle: 'Update your password',
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ChangePasswordScreen()),
+                  );
+                },
               ),
             ]),
 
@@ -186,7 +198,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.grey,
             spreadRadius: 1,
             blurRadius: 10,
             offset: const Offset(0, 2),
