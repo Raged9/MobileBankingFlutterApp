@@ -1,5 +1,3 @@
-// lib/widgets/balance_card.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_data_provider.dart';
@@ -74,7 +72,7 @@ class _BalanceCardState extends State<BalanceCard> {
                 children: [
                   const SizedBox(height: 20),
                   const Text(
-                    'Your Balance',
+                    'Saldo Anda',
                     style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                   const SizedBox(height: 8),
@@ -101,7 +99,7 @@ class _BalanceCardState extends State<BalanceCard> {
                               ),
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 18,
+                                fontSize: 16,
                                 letterSpacing: 2,
                               ),
                             ),
