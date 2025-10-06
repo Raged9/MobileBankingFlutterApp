@@ -1,5 +1,3 @@
-// lib/screens/edit_profile_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_data_provider.dart';
@@ -16,17 +14,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _nameController;
   bool _isLoading = false;
 
+  // Controller untuk data read-only
+  late TextEditingController _emailController;
+  late TextEditingController _phoneController;
+
   @override
   void initState() {
     super.initState();
-    // Ambil nama saat ini dari provider untuk ditampilkan di form
-    final currentName = Provider.of<UserDataProvider>(context, listen: false).userData?.name ?? '';
-    _nameController = TextEditingController(text: currentName);
+    final userProvider = Provider.of<UserDataProvider>(context, listen: false);
+    final currentUser = userProvider.userData;
+
+    // Inisialisasi semua controller dengan data yang ada
+    _nameController = TextEditingController(text: currentUser?.name ?? '');
+    _emailController = TextEditingController(text: currentUser?.email ?? '');
+    _phoneController = TextEditingController(text: currentUser?.phoneNumber ?? '');
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -39,7 +47,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final newName = _nameController.text;
       final provider = Provider.of<UserDataProvider>(context, listen: false);
       
-      // Panggil fungsi di provider untuk update nama
       await provider.updateUserName(newName);
 
       if (!mounted) return;
@@ -58,43 +65,93 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  Widget _buildReadOnlyField({
+    required IconData icon,
+    required String label,
+    required TextEditingController controller,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        controller: controller,
+        readOnly: true,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon),
+          border: const OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.grey[200], 
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profil'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nama Lengkap',
-                  border: OutlineInputBorder(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nama Lengkap',
+                    prefixIcon: Icon(Icons.person_outline),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Nama tidak boleh kosong';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Nama tidak boleh kosong';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: _isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : ElevatedButton(
-                        onPressed: _saveProfile,
-                        child: const Text('Simpan Perubahan'),
-                      ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                
+                _buildReadOnlyField(
+                  icon: Icons.email_outlined,
+                  label: 'Email',
+                  controller: _emailController,
+                ),
+                _buildReadOnlyField(
+                  icon: Icons.phone_outlined,
+                  label: 'Nomor Telepon',
+                  controller: _phoneController,
+                ),
+                const SizedBox(height: 12),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    'Untuk mengganti email dan nomor hp, hubungi support center di hellobank@gmail.com',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ElevatedButton(
+                          onPressed: _saveProfile,
+                          child: const Text('Simpan Perubahan'),
+                        ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

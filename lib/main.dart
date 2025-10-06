@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:async'; // Import untuk Timer
-
+import 'dart:async';
 import 'common/theme.dart';
 import 'providers/user_data_provider.dart';
 import 'screens/home_screen.dart';
@@ -24,9 +23,9 @@ class MobileBankingApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Mobile Banking App',
-      theme: appTheme, // Menggunakan tema kustom
+      theme: appTheme, 
       debugShowCheckedModeBanner: false,
-      home: const SplashScreen(), // Menampilkan SplashScreen pertama kali
+      home: const SplashScreen(),
     );
   }
 }
@@ -57,13 +56,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor, // Warna latar belakang sesuai tema
+      backgroundColor: Theme.of(context).primaryColor, 
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/images/Logo.png', // Pastikan path ini benar
+              'assets/images/Logo.png', 
               height: 150,
             ),
             const SizedBox(height: 20),
